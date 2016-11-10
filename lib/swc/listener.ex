@@ -12,8 +12,6 @@ defmodule SimpleWebsocketClient.Listener do
 
       @doc false
       def init(socket) do
-        IO.puts "initing"
-        IO.inspect socket
         {:ok, socket}
       end
 
