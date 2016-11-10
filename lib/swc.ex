@@ -1,0 +1,64 @@
+require Logger
+
+defmodule SimpleWebsocketClient.ConnectionConfig do
+  defstruct host: "localhost", port: 80, path: "/"
+end
+
+defmodule SimpleWebsocketClient.PoolConfig do
+  defstruct \
+    size: 4, overflow: 2, name: :websocket_pool, 
+    worker: SimpleWebsocketClient.Worker
+end
+
+defmodule SimpleWebsocketClient do  
+  use Supervisor
+  import Supervisor.Spec
+  alias SimpleWebsocketClient.{ConnectionConfig, PoolConfig}
+
+  def start_link(args) do
+      Supervisor.start_link(__MODULE__, args, [])
+  end
+
+  def init({connection, pool, listener}) do
+
+    poolboy_config = [
+      {:name, {:local, pool.name}},
+      {:worker_module, pool.worker},
+      {:size, pool.size},
+      {:max_overflow, pool.overflow}
+    ]
+
+    children = [
+      :poolboy.child_spec(pool.name, poolboy_config, {connection, listener})
+    ]
+
+    options = [
+      strategy: :one_for_one,
+      name: SimpleWebsocketClient.Supervisor
+    ]
+
+    supervise(children, options)
+  end
+
+  def connect(connection_config, pool_config, listener) do
+    start_link({connection_config, pool_config, listener})
+  end
+
+  def send(msg) do
+    msg
+    |> validate
+    |> transaction_send
+  end
+
+  def validate(msg) when is_binary(msg),
+    do: msg
+  def validate(msg) when is_map(msg),
+    do: Poison.encode! msg 
+  def validate(msg),
+    do: raise RuntimeError, "Invalid message"
+
+  defp transaction_send(msg) do
+    :poolboy.transaction(:websocket_pool, fn(worker) -> 
+      GenServer.call(worker, {:send, msg}) end)
+  end
+end
