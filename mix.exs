@@ -7,6 +7,7 @@ defmodule SimpleWebsocketClient.Mixfile do
      elixir: "~> 1.4-dev",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     elixirc_paths: compile_paths(Mix.env),
      deps: deps()]
   end
 
@@ -14,8 +15,13 @@ defmodule SimpleWebsocketClient.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poolboy]]
+    [applications: [:logger, :poolboy, :cowboy]]
   end
+
+  defp compile_paths(:test),
+    do: ["lib", "test/helper"]
+  defp compile_paths(_),
+    do: ["lib"]
 
   # Dependencies can be Hex packages:
   #
@@ -29,6 +35,7 @@ defmodule SimpleWebsocketClient.Mixfile do
   defp deps do
     [{:socket, "~> 0.3"},
      {:poolboy, "~> 1.5"},
-     {:poison, "~> 3.0"}]
+     {:poison, "~> 3.0"},
+     {:cowboy, "~> 1.0"}]
   end
 end
