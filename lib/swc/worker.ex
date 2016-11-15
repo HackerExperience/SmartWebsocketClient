@@ -19,7 +19,7 @@ defmodule SimpleWebsocketClient.Worker do
 
   def handle_call({:send, msg}, _from, socket) do
     socket
-    |> SimpleWebsocketClient.Socket.send(msg) 
+    |> SimpleWebsocketClient.Socket.send(msg)
     {:reply, nil, socket}
   end
 
