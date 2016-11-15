@@ -16,7 +16,6 @@ defmodule SimpleWebsocketClient.Socket do
 
   def send(socket, msg) do
     socket
-    |> Socket.Web.send!({:text, msg})    
+    |> Socket.Web.send!({:text, msg})
   end
-
 end
