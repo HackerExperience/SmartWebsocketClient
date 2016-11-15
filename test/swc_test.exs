@@ -28,12 +28,12 @@ defmodule SimpleWebsocketClientTest do
   describe "connection" do
     test "client is able to connect to a WS server", ctx do
       assert {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      SimpleWebsocketClient.disconnect(pid, :websocket_pool)
+      SimpleWebsocketClient.disconnect
     end
 
     test "client successfully disconnects", ctx do
       {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      assert :ok = SimpleWebsocketClient.disconnect(pid, :websocket_pool)
+      assert :ok = SimpleWebsocketClient.disconnect
       refute Process.alive?(pid)
     end
 
@@ -47,7 +47,7 @@ defmodule SimpleWebsocketClientTest do
       {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
       pool_name = SimpleWebsocketClient.Pool.default_name
       assert {:ready, 1, 0, _} = :poolboy.status(pool_name)
-      SimpleWebsocketClient.disconnect(pid, pool_name)
+      SimpleWebsocketClient.disconnect()
     end
 
     test "pool is properly set up", ctx do
@@ -58,7 +58,7 @@ defmodule SimpleWebsocketClientTest do
       assert pool_size == pool.size
       assert overflow <= pool.overflow
 
-      SimpleWebsocketClient.disconnect(pid, pool.name)
+      SimpleWebsocketClient.disconnect()
     end
   end
 
@@ -69,7 +69,7 @@ defmodule SimpleWebsocketClientTest do
         SimpleWebsocketClient.send("MyCoolMessage")
         :timer.sleep(20)
       end) =~ "MyCoolMessage"
-      SimpleWebsocketClient.disconnect(pid, :websocket_pool)
+      SimpleWebsocketClient.disconnect()
     end
 
     test "client sends a message to the server (with pool)", ctx do
@@ -79,7 +79,7 @@ defmodule SimpleWebsocketClientTest do
         SimpleWebsocketClient.send("MyPooledMessage")
         :timer.sleep(20)
       end) =~ "MyPooledMessage"
-      SimpleWebsocketClient.disconnect(pid, pool.name)
+      SimpleWebsocketClient.disconnect()
     end
   end
 
@@ -90,6 +90,7 @@ defmodule SimpleWebsocketClientTest do
         SimpleWebsocketClient.send("MyListenedMessage")
         :timer.sleep(20)
       end) =~ "Received: MyListenedMessage"
+      SimpleWebsocketClient.disconnect()
     end
   end
 
