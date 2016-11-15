@@ -17,10 +17,10 @@ defmodule SimpleWebsocketClient.Worker do
     {:ok, socket}
   end
 
-  def handle_call({:send, msg}, _from, socket) do
+  def handle_cast({:send, msg}, socket) do
     socket
     |> SimpleWebsocketClient.Socket.send(msg)
-    {:reply, nil, socket}
+    {:noreply, socket}
   end
 
   defp create_socket(%Connection{host: host, port: port, path: path}) do

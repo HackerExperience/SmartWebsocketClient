@@ -54,7 +54,7 @@ defmodule SimpleWebsocketClient do
 
   defp transaction_send(msg) do
     :poolboy.transaction(:websocket_pool, fn(worker) ->
-      GenServer.call(worker, {:send, msg})
+      GenServer.cast(worker, {:send, msg})
     end)
   end
 end
