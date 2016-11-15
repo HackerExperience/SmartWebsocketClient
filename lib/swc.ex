@@ -22,12 +22,7 @@ defmodule SimpleWebsocketClient do
       worker(SimpleWebsocketClient.Manager, [{self(), pool.name}, [name: SWCManager]])
     ]
 
-    options = [
-      strategy: :one_for_one,
-      name: SimpleWebsocketClient.Supervisor
-    ]
-
-    supervise(children, options)
+    supervise(children, [strategy: :one_for_one])
   end
 
   def connect(connection_config, pool_config, listener) do
