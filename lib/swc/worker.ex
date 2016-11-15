@@ -1,6 +1,6 @@
 defmodule SimpleWebsocketClient.Worker do
   use GenServer
-  alias SimpleWebsocketClient.ConnectionConfig
+  alias SimpleWebsocketClient.Connection
 
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, [])
@@ -23,7 +23,7 @@ defmodule SimpleWebsocketClient.Worker do
     {:reply, nil, socket}
   end
 
-  defp create_socket(%ConnectionConfig{host: host, port: port, path: path}) do
+  defp create_socket(%Connection{host: host, port: port, path: path}) do
     SimpleWebsocketClient.Socket.connect(host, port, path)
   end
 end

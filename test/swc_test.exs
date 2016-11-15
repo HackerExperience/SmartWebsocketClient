@@ -15,7 +15,7 @@ defmodule SimpleWebsocketClientTest do
   end
 
   setup do
-    connection = %SimpleWebsocketClient.ConnectionConfig{port: @test_port}
+    connection = %SimpleWebsocketClient.Connection{port: @test_port}
     listener = ListenerLogger
 
     [valid_connection: connection, listener: listener]
@@ -45,13 +45,13 @@ defmodule SimpleWebsocketClientTest do
   describe "pool" do
     test "use single connection pool if no pool is specified", ctx do
       {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      pool_name = SimpleWebsocketClient.PoolConfig.default_name
+      pool_name = SimpleWebsocketClient.Pool.default_name
       assert {:ready, 1, 0, _} = :poolboy.status(pool_name)
       SimpleWebsocketClient.disconnect(pid, pool_name)
     end
 
     test "pool is properly set up", ctx do
-      pool = %SimpleWebsocketClient.PoolConfig{size: 2, overflow: 1, name: :test_pool}
+      pool = %SimpleWebsocketClient.Pool{size: 2, overflow: 1, name: :test_pool}
       {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], pool, ctx[:listener])
 
       assert {:ready, pool_size, overflow, _} = :poolboy.status(:test_pool)
@@ -73,7 +73,7 @@ defmodule SimpleWebsocketClientTest do
     end
 
     test "client sends a message to the server (with pool)", ctx do
-      pool = %SimpleWebsocketClient.PoolConfig{size: 2, overflow: 1}
+      pool = %SimpleWebsocketClient.Pool{size: 2, overflow: 1}
       {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], pool, ctx[:listener])
       assert capture_log(fn ->
         SimpleWebsocketClient.send("MyPooledMessage")
