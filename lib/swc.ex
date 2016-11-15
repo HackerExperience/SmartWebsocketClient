@@ -29,7 +29,8 @@ defmodule SimpleWebsocketClient do
     ]
 
     children = [
-      :poolboy.child_spec(pool.name, poolboy_config, {connection, listener})
+      :poolboy.child_spec(pool.name, poolboy_config, {connection, listener}),
+      worker(SimpleWebsocketClient.Manager, [{self(), pool.name}, [name: SWCManager]])
     ]
 
     options = [
@@ -42,6 +43,16 @@ defmodule SimpleWebsocketClient do
 
   def connect(connection_config, pool_config, listener) do
     start_link({connection_config, pool_config, listener})
+  end
+
+  def connect(connection_config, listener) do
+    start_link({connection_config, @single_connection_pool, listener})
+  end
+
+  def disconnect() do
+    manager_data = GenServer.call(SWCManager, {:fetch})
+    :poolboy.stop(manager_data[:pool_name])
+    Supervisor.stop(manager_data[:supervisor_pid])
   end
 
   def send(msg) do
