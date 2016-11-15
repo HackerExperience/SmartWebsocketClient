@@ -25,7 +25,7 @@ defmodule SimpleWebsocketClient.Listener do
             wait_for_message(socket)
           {:ping, _} ->
             handle_ping(socket)
-          unknown ->
+          _ ->
             handle_unknown(socket)
           end
       end

@@ -1,19 +1,20 @@
 defmodule SimpleWebsocketClient do
   use Supervisor
   import Supervisor.Spec
-  alias SimpleWebsocketClient.{ConnectionConfig, PoolConfig}
+  alias SimpleWebsocketClient.Pool
+
+  @single_connection_pool %SimpleWebsocketClient.Pool{size: 1, overflow: 0}
 
   def start_link(args) do
-      Supervisor.start_link(__MODULE__, args, [])
+    Supervisor.start_link(__MODULE__, args, [])
   end
 
   def init({connection, pool, listener}) do
-
     poolboy_config = [
-      {:name, {:local, pool.name}},
-      {:worker_module, pool.worker},
-      {:size, pool.size},
-      {:max_overflow, pool.overflow}
+      name: {:local, pool.name},
+      worker_module: pool.worker,
+      size: pool.size,
+      max_overflow: pool.overflow
     ]
 
     children = [
@@ -45,19 +46,20 @@ defmodule SimpleWebsocketClient do
 
   def send(msg) do
     msg
-    |> validate
-    |> transaction_send
+    |> validate()
+    |> transaction_send()
   end
 
   def validate(msg) when is_binary(msg),
     do: msg
   def validate(msg) when is_map(msg),
-    do: Poison.encode! msg 
+    do: Poison.encode!(msg)
   def validate(msg),
-    do: raise RuntimeError, "Invalid message"
+    do: raise RuntimeError, "invalid message"
 
   defp transaction_send(msg) do
-    :poolboy.transaction(:websocket_pool, fn(worker) -> 
-      GenServer.call(worker, {:send, msg}) end)
+    :poolboy.transaction(:websocket_pool, fn(worker) ->
+      GenServer.call(worker, {:send, msg})
+    end)
   end
 end
