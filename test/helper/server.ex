@@ -1,6 +1,6 @@
 defmodule SimpleWebsocketClient.Test.Helper.Server do
-
   @behaviour :cowboy_websocket_handler
+  import Logger
 
   @doc ~S"""
     Starts the router, usually called from a supervisor.
@@ -43,10 +43,8 @@ defmodule SimpleWebsocketClient.Test.Helper.Server do
   Request handler, deals with JSON message propagation and response.
   """
   def websocket_handle({:text, message}, req, state) do
-    IO.puts "recv"
-    IO.inspect message
-
-    {:reply, {:text, "rai"}, req, state}
+    Logger.debug message
+    {:reply, {:text, message}, req, state}
   end
 
   @doc ~S"""

@@ -2,8 +2,10 @@ defmodule SimpleWebsocketClientTest do
   use ExUnit.Case
   doctest SimpleWebsocketClient
   alias SimpleWebsocketClient.Test.Helper.Server
+  alias SimpleWebsocketClient.Test.Helper.ListenerLogger
+  import ExUnit.CaptureLog
 
-  @moduletag timeout: 3_000
+  @moduletag timeout: 2_000
   @test_port 6666
 
   setup_all do
@@ -14,7 +16,7 @@ defmodule SimpleWebsocketClientTest do
 
   setup do
     connection = %SimpleWebsocketClient.ConnectionConfig{port: @test_port}
-    listener = ReturnListener
+    listener = ListenerLogger
 
     [valid_connection: connection, listener: listener]
   end
@@ -60,13 +62,35 @@ defmodule SimpleWebsocketClientTest do
     end
   end
 
-end
-
-defmodule ReturnListener do
-
-    use SimpleWebsocketClient.Listener
-
-    def on_receive(msg) do
-      msg
+  describe "send" do
+    test "client sends a message to the server (no pool)", ctx do
+      {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
+      assert capture_log(fn ->
+        SimpleWebsocketClient.send("MyCoolMessage")
+        :timer.sleep(20)
+      end) =~ "MyCoolMessage"
+      SimpleWebsocketClient.disconnect(pid, :websocket_pool)
     end
+
+    test "client sends a message to the server (with pool)", ctx do
+      pool = %SimpleWebsocketClient.PoolConfig{size: 2, overflow: 1}
+      {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], pool, ctx[:listener])
+      assert capture_log(fn ->
+        SimpleWebsocketClient.send("MyPooledMessage")
+        :timer.sleep(20)
+      end) =~ "MyPooledMessage"
+      SimpleWebsocketClient.disconnect(pid, pool.name)
+    end
+  end
+
+  describe "receive" do
+    test "SWC worker forwards received messages to the listener", ctx do
+      {:ok, pid} = SimpleWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
+      assert capture_log(fn ->
+        SimpleWebsocketClient.send("MyListenedMessage")
+        :timer.sleep(20)
+      end) =~ "Received: MyListenedMessage"
+    end
+  end
+
 end
