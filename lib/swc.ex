@@ -1,16 +1,4 @@
-require Logger
-
-defmodule SimpleWebsocketClient.ConnectionConfig do
-  defstruct host: "localhost", port: 80, path: "/"
-end
-
-defmodule SimpleWebsocketClient.PoolConfig do
-  defstruct \
-    size: 4, overflow: 2, name: :websocket_pool, 
-    worker: SimpleWebsocketClient.Worker
-end
-
-defmodule SimpleWebsocketClient do  
+defmodule SimpleWebsocketClient do
   use Supervisor
   import Supervisor.Spec
   alias SimpleWebsocketClient.{ConnectionConfig, PoolConfig}
