@@ -1,3 +1,3 @@
-defmodule SimpleWebsocketClient.Connection do
+defmodule SmartWebsocketClient.Connection do
   defstruct host: "127.0.0.1", port: 80, path: "/"
 end

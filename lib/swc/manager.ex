@@ -1,4 +1,4 @@
-defmodule SimpleWebsocketClient.Manager do
+defmodule SmartWebsocketClient.Manager do
   use GenServer
 
   def start_link(args, opts \\ []) do

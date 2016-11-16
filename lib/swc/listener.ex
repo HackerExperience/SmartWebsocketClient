@@ -1,9 +1,9 @@
-defmodule SimpleWebsocketClient.Listener do
+defmodule SmartWebsocketClient.Listener do
   @callback on_receive(msg :: any) :: any
 
   defmacro __using__(_) do
     quote location: :keep do
-      @behaviour SimpleWebsocketClient.Listener
+      @behaviour SmartWebsocketClient.Listener
 
       @doc false
       def start_link do
@@ -18,7 +18,7 @@ defmodule SimpleWebsocketClient.Listener do
       @doc false
       def wait_for_message(socket) do
         socket
-        |> SimpleWebsocketClient.Socket.recv
+        |> SmartWebsocketClient.Socket.recv
         |> case do
           {:text, data} ->
             on_receive(data)
@@ -44,7 +44,7 @@ defmodule SimpleWebsocketClient.Listener do
       @doc false
       def handle_ping(socket) do
         socket
-        |> SimpleWebsocketClient.Socket.send(:pong)
+        |> SmartWebsocketClient.Socket.send(:pong)
         wait_for_message(socket)
       end
 

@@ -1,9 +1,9 @@
-defmodule SimpleWebsocketClient do
+defmodule SmartWebsocketClient do
   use Supervisor
   import Supervisor.Spec
-  alias SimpleWebsocketClient.Pool
+  alias SmartWebsocketClient.Pool
 
-  @single_connection_pool %SimpleWebsocketClient.Pool{size: 1, overflow: 0}
+  @single_connection_pool %SmartWebsocketClient.Pool{size: 1, overflow: 0}
 
   def start_link(args) do
     Supervisor.start_link(__MODULE__, args, [])
@@ -19,7 +19,7 @@ defmodule SimpleWebsocketClient do
 
     children = [
       :poolboy.child_spec(pool.name, poolboy_config, {connection, listener}),
-      worker(SimpleWebsocketClient.Manager, [{self(), pool.name}, [name: SWCManager]])
+      worker(SmartWebsocketClient.Manager, [{self(), pool.name}, [name: SWCManager]])
     ]
 
     supervise(children, [strategy: :one_for_one])

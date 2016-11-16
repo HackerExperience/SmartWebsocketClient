@@ -1,4 +1,4 @@
-defmodule SimpleWebsocketClient.Test.Helper.Server do
+defmodule SmartWebsocketClient.Test.Helper.Server do
   @behaviour :cowboy_websocket_handler
   import Logger
 

@@ -1,4 +1,4 @@
-defmodule SimpleWebsocketClient.Socket do
+defmodule SmartWebsocketClient.Socket do
 
   def connect(host, port, path) do
     Socket.Web.connect!(host, port, path: path)

@@ -1,4 +1,4 @@
-defmodule SimpleWebsocketClient.Mixfile do
+defmodule SmartWebsocketClient.Mixfile do
   use Mix.Project
 
   def project do

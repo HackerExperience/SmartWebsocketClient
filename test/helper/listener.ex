@@ -1,5 +1,5 @@
-defmodule SimpleWebsocketClient.Test.Helper.ListenerLogger do
-  use SimpleWebsocketClient.Listener
+defmodule SmartWebsocketClient.Test.Helper.ListenerLogger do
+  use SmartWebsocketClient.Listener
   import Logger
 
   def on_receive(msg) do

@@ -1,4 +1,4 @@
-defmodule SimpleWebsocketClient.Pool do
+defmodule SmartWebsocketClient.Pool do
 
   @default_name :websocket_pool
 
@@ -6,7 +6,7 @@ defmodule SimpleWebsocketClient.Pool do
     size: 4,
     overflow: 2,
     name: @default_name,
-    worker: SimpleWebsocketClient.Worker
+    worker: SmartWebsocketClient.Worker
 
   def default_name do
     @default_name

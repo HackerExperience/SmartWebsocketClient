@@ -1,4 +1,4 @@
-# SimpleWebsocketClient
+# SmartWebsocketClient
 
 **TODO: Add description**
 
