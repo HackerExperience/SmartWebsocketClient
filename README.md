@@ -15,31 +15,31 @@ SWC adds support for pools through [poolboy](https://github.com/devinus/poolboy)
 Connecting and sending/receiving messages is very straightforward. Here's an example:
 
 ```elixir
-    defmodule MyClient do
-      alias SmartWebsocketClient.{Connection, Pool}
+  defmodule MyClient do
+    alias SmartWebsocketClient.{Connection, Pool}
 
-      def run do
-        connection = %Connection{host: "127.0.0.1", port: 80, path: "/"}
-        pool = %Pool{size: 10, overflow: 5}
-        SmartWebsocketClient.connect(connection, pool, MyListener)
-        SmartWebsocketClient.send("My message")
+    def run do
+      connection = %Connection{host: "127.0.0.1", port: 80, path: "/"}
+      pool = %Pool{size: 10, overflow: 5}
+      SmartWebsocketClient.connect(connection, MyListener, pool)
+      SmartWebsocketClient.send("My message")
 
-        # If you don't want to run the client forever, uncomment the line below
-        #SmartWebsocketClient.disconnect()
-      end
+      # If you don't want to run the client forever, uncomment the line below
+      #SmartWebsocketClient.disconnect()
     end
+  end
 
-    defmodule MyListener do
-      use SmartWebsocketClient.Listener
+  defmodule MyListener do
+    use SmartWebsocketClient.Listener
 
-      def on_receive(msg) do
-        IO.puts "Message received!"
-        IO.inspect msg
-      end
+    def on_receive(msg) do
+      IO.puts "Message received!"
+      IO.inspect msg
     end
+  end
 ```
 
-Hopefully the above example gives an idea of the library's interface. You don't need to specify a pool if you do not want one. Use `connect/2` instead.
+The above example gives an idea of the library's interface. You don't need to specify a pool if you do not want one.
 
 ## Listener
 
