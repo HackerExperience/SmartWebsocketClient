@@ -18,22 +18,18 @@ defmodule SmartWebsocketClientTest do
     connection = %SmartWebsocketClient.Connection{port: @test_port}
     listener = ListenerLogger
 
-    [valid_connection: connection, listener: listener]
-  end
-
-  setup ctx do
-    :ok
+    {:ok , [connection: connection, listener: listener]}
   end
 
   describe "connection" do
     test "client is able to connect to a WS server", ctx do
-      assert {:ok, pid} = SmartWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      SmartWebsocketClient.disconnect
+      assert {:ok, _} = SmartWebsocketClient.connect(ctx.connection, ctx.listener)
+      SmartWebsocketClient.disconnect()
     end
 
     test "client successfully disconnects", ctx do
-      {:ok, pid} = SmartWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      assert :ok = SmartWebsocketClient.disconnect
+      {:ok, pid} = SmartWebsocketClient.connect(ctx.connection, ctx.listener)
+      assert SmartWebsocketClient.disconnect()
       refute Process.alive?(pid)
     end
 
@@ -44,15 +40,15 @@ defmodule SmartWebsocketClientTest do
 
   describe "pool" do
     test "use single connection pool if no pool is specified", ctx do
-      {:ok, pid} = SmartWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      pool_name = SmartWebsocketClient.Pool.default_name
+      SmartWebsocketClient.connect(ctx.connection, ctx.listener)
+      pool_name = SmartWebsocketClient.Pool.default_name()
       assert {:ready, 1, 0, _} = :poolboy.status(pool_name)
       SmartWebsocketClient.disconnect()
     end
 
     test "pool is properly set up", ctx do
       pool = %SmartWebsocketClient.Pool{size: 2, overflow: 1, name: :test_pool}
-      {:ok, pid} = SmartWebsocketClient.connect(ctx[:valid_connection], pool, ctx[:listener])
+      SmartWebsocketClient.connect(ctx.connection, ctx.listener, pool)
 
       assert {:ready, pool_size, overflow, _} = :poolboy.status(:test_pool)
       assert pool_size == pool.size
@@ -64,34 +60,66 @@ defmodule SmartWebsocketClientTest do
 
   describe "send" do
     test "client sends a message to the server (no pool)", ctx do
-      {:ok, pid} = SmartWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      assert capture_log(fn ->
-        SmartWebsocketClient.send("MyCoolMessage")
-        :timer.sleep(20)
-      end) =~ "MyCoolMessage"
+      SmartWebsocketClient.connect(ctx.connection, ctx.listener)
+      message = "MyCoolMessage"
+      log_msg = capture_log(fn ->
+        SmartWebsocketClient.send(message)
+        :timer.sleep(10)
+      end)
+      assert log_msg =~ message
       SmartWebsocketClient.disconnect()
     end
 
     test "client sends a message to the server (with pool)", ctx do
       pool = %SmartWebsocketClient.Pool{size: 2, overflow: 1}
-      {:ok, pid} = SmartWebsocketClient.connect(ctx[:valid_connection], pool, ctx[:listener])
-      assert capture_log(fn ->
-        SmartWebsocketClient.send("MyPooledMessage")
-        :timer.sleep(20)
-      end) =~ "MyPooledMessage"
+      SmartWebsocketClient.connect(ctx.connection, ctx.listener, pool)
+      message = "MyPooledMessage"
+      log_msg = capture_log(fn ->
+        SmartWebsocketClient.send(message)
+        :timer.sleep(10)
+      end)
+      assert log_msg =~ message
+      SmartWebsocketClient.disconnect()
+    end
+
+    test "client is able to send a map (converts to json)", ctx do
+      SmartWebsocketClient.connect(ctx.connection, ctx.listener)
+      log_msg = capture_log(fn ->
+        SmartWebsocketClient.send(%{my: "map"})
+        :timer.sleep(10)
+      end)
+      assert log_msg =~ ~s/{"my":"map"}/
       SmartWebsocketClient.disconnect()
     end
   end
 
   describe "receive" do
     test "SWC worker forwards received messages to the listener", ctx do
-      {:ok, pid} = SmartWebsocketClient.connect(ctx[:valid_connection], ctx[:listener])
-      assert capture_log(fn ->
-        SmartWebsocketClient.send("MyListenedMessage")
-        :timer.sleep(20)
-      end) =~ "Received: MyListenedMessage"
+      SmartWebsocketClient.connect(ctx.connection, ctx.listener)
+      message = "MyListenedMessage"
+      log_msg = capture_log(fn ->
+        SmartWebsocketClient.send(message)
+        :timer.sleep(10)
+      end)
+      assert log_msg =~ message
       SmartWebsocketClient.disconnect()
     end
   end
 
+  describe "ping" do
+    test "SWC automatically handles ping messages", ctx do
+      SmartWebsocketClient.connect(ctx.connection, ctx.listener)
+
+      request_ping = fn ->
+        log_msg = capture_log(fn ->
+          SmartWebsocketClient.send("send_me_ping")
+          :timer.sleep(10)
+        end)
+        assert log_msg =~ "server received pong"
+      end
+      for _ <- 0..10, do: request_ping.()
+
+      SmartWebsocketClient.disconnect()
+    end
+  end
 end

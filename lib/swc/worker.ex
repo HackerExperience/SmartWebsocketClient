@@ -1,11 +1,15 @@
 defmodule SmartWebsocketClient.Worker do
+  @moduledoc false
   use GenServer
   alias SmartWebsocketClient.Connection
 
+
+  @doc false
   def start_link(args) do
     GenServer.start_link(__MODULE__, args, [])
   end
 
+  @doc false
   def init({connection, listener}) do
     # Create socket
     socket = create_socket(connection)
@@ -17,6 +21,7 @@ defmodule SmartWebsocketClient.Worker do
     {:ok, socket}
   end
 
+  @doc false
   def handle_cast({:send, msg}, socket) do
     socket
     |> SmartWebsocketClient.Socket.send(msg)

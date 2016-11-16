@@ -2,12 +2,13 @@ defmodule SmartWebsocketClient.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :smart_websocket_Client,
+    [app: :smart_websocket_client,
      version: "0.1.0",
-     elixir: "~> 1.4-dev",
+     elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      elixirc_paths: compile_paths(Mix.env),
+     elixirc_options: [warnings_as_errors: true],
      deps: deps()]
   end
 
@@ -36,6 +37,7 @@ defmodule SmartWebsocketClient.Mixfile do
     [{:socket, "~> 0.3"},
      {:poolboy, "~> 1.5"},
      {:poison, "~> 3.0"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:ex_doc, "~> 0.14", only: :dev}]
   end
 end
