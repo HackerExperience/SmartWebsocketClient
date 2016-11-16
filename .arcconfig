@@ -1,3 +1,4 @@
 {
-  "phabricator.uri" : "https://dev.hackerexperience.com"
+  "phabricator.uri" : "https://dev.hackerexperience.com",
+  "history.immutable": true
 }
