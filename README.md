@@ -53,3 +53,4 @@ The default Listener behaviour automatically handles ping messages.
 
 - [] Add interaction between Listener and GenServer, so the GenServer behind Listener is non-blocking and can handle different messages
 - [] Currently only one SWC can be run per node. Make SWC use only PIDs (instead of registered names) and support multiple clients per node.
+- [] Add type specs
