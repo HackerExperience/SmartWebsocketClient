@@ -149,12 +149,10 @@ defmodule SmartWebsocketClient do
   defp validate(_),
     do: raise ArgumentError, "invalid message"
 
-  @docp """
-  This function is responsible for handling the pool. A transaction in poolboy
-  world means I'm reserving a worker for myself and no one else can use it while
-  I don't finish my stuff. If the worker dies while in a transaction, poolboy
-  takes care of it.
-  """
+  # This function is responsible for handling the pool. A transaction in poolboy
+  # world means I'm reserving a worker for myself and no one else can use it while
+  # I don't finish my stuff. If the worker dies while in a transaction, poolboy
+  # takes care of it.
   defp transaction_send(msg) do
     :poolboy.transaction(:websocket_pool, fn(worker) ->
       GenServer.cast(worker, {:send, msg})

@@ -1,6 +1,5 @@
 defmodule SmartWebsocketClient.Manager do
-  @moduledoc false
-  @docp """
+  @moduledoc """
   This module is used to keep some state of the SWC. Notably, we need its
   supervisor's pid and the pool name.
 
