@@ -144,8 +144,13 @@ defmodule SmartWebsocketClient.Listener do
         :ok
       end
 
+      @doc false
+      def terminate(reason, state) do
+        :ok
+      end
+
       defoverridable [init: 1, handle_cast: 2, wait_message: 1, listen: 1,
-                      handle_ping: 1, handle_unknown: 1]
+                      handle_ping: 1, handle_unknown: 1, terminate: 2]
 
     end
   end
