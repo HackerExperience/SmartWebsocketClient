@@ -1,6 +1,5 @@
 defmodule SmartWebsocketClient.Socket do
-  @moduledoc false
-  @docp """
+  @moduledoc """
   Generic websocket interface.
 
   This module is a simple interface to the lower level socket library we use.

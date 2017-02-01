@@ -9,7 +9,11 @@ defmodule SmartWebsocketClient.Mixfile do
      start_permanent: Mix.env == :prod,
      elixirc_paths: compile_paths(Mix.env),
      elixirc_options: [warnings_as_errors: true],
-     deps: deps()]
+     deps: deps(),
+     description: """
+     SmartWebsocketClient is a (not-so) smart websocket client with pool support.
+     """,
+     package: package()]
   end
 
   # Configuration for the OTP application
@@ -40,4 +44,12 @@ defmodule SmartWebsocketClient.Mixfile do
      {:cowboy, "~> 1.0"},
      {:ex_doc, "~> 0.14", only: :dev}]
   end
+
+  defp package do
+    [files: ["lib", "mix.exs", "README*"],
+     maintainers: ["Renato Massaro"],
+     licenses: ["MIT"],
+     links: %{"github" => "https://github.com/HackerExperience/SmartWebsocketClient"}]
+  end
+
 end
